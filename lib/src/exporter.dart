@@ -106,7 +106,15 @@ class Exporter {
 
   static image.Image _encodeGifWIthTransparency(image.Image srcImage,
       {int transparencyThreshold = 1}) {
-    final newImage = image.quantize(srcImage);
+    // Ensure the image format is uint8 to prevent encoding failures.
+    var format = srcImage.format;
+    image.Image image32;
+    if (format != image.Format.int8) {
+      image32 = srcImage.convert(format: image.Format.uint8);
+    } else {
+      image32 = srcImage;
+    }
+    final newImage = image.quantize(image32);
 
     // GifEncoder will use palette colors with a 0 alpha as transparent. Look at the pixels
     // of the original image and set the alpha of the palette color to 0 if the pixel is below
